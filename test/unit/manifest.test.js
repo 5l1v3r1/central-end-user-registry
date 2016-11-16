@@ -58,6 +58,11 @@ Test('manifest', function (manifestTest) {
       assert.end()
     })
 
+    registrationsTest.test('register routes', function (assert) {
+      assert.ok(findPluginByPath(Manifest.registrations, './routes'))
+      assert.end()
+    })
+
     registrationsTest.test('register hapi-swagger plugin', function (assert) {
       let found = findPluginByRegisterName(Manifest.registrations, 'hapi-swagger')
 

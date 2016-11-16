@@ -4,12 +4,27 @@ general:
       - master
 
 machine:
+  pre:
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
+  services:
+    - docker
   node:
     version: 6.5.0
+  environment:
+    DOCKER_REPO: modusbox-level1-docker-release.jfrog.io
+    APP_NAME: central-end-user-registry
+    DOCKER_IMAGE: $DOCKER_REPO/$APP_NAME
+    BUCKET: elasticbeanstalk-us-west-2-886403637725
+    EB_ENV: central-end-user-registry-dev
+    EB_REGION: us-west-2
+    FUNC_TEST_CMD: tape 'test/functional/**/*.test.js' | tap-xunit > ./test/results/tape-functional.xml
 
 dependencies:
   pre:
+    - sudo pip install docker-compose
     - curl -udwolla:$NPM_TOKEN "https://modusbox.jfrog.io/modusbox/api/npm/level1-npm-release/auth/leveloneproject" >> .npmrc
+  post:
+    - docker build -t $DOCKER_IMAGE .
 
 test:
   pre:
@@ -17,6 +32,7 @@ test:
   override:
     - set -o pipefail && npm -s run test:xunit > ./test/results/tape.xml
     - set -o pipefail && npm -s run test:coverage-check
+    - npm -s run test:circle
   post:
     - cp ./test/results/* $CIRCLE_TEST_REPORTS
     - mv ./coverage $CIRCLE_ARTIFACTS

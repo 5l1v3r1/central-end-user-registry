@@ -15,6 +15,7 @@ module.exports = {
   registrations: [
     { plugin: 'inert' },
     { plugin: 'vision' },
+    { plugin: './routes' },
     {
       plugin: {
         register: 'hapi-swagger',

@@ -1,15 +1,14 @@
 'use strict'
 
-const src = '../../src'
 const P = require('bluebird')
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
-const Db = require(`${src}/db`)
+const Db = require('../../src/db')
 const Glue = require('glue')
 const Logger = require('@leveloneproject/central-services-shared').Logger
-const Migrator = require(`${src}/lib/migrator`)
+const Migrator = require('../../src/lib/migrator')
 
-Test('server', function (serverTest) {
+Test('server', serverTest => {
   let sandbox
 
   serverTest.beforeEach(t => {
@@ -17,11 +16,13 @@ Test('server', function (serverTest) {
     sandbox.stub(Db, 'connect')
     sandbox.stub(Glue, 'compose')
     sandbox.stub(Logger, 'info')
+    sandbox.stub(Logger, 'error')
     sandbox.stub(Migrator, 'migrate')
     t.end()
   })
 
   serverTest.afterEach(t => {
+    delete require.cache[require.resolve('../../src/server')]
     sandbox.restore()
     t.end()
   })
@@ -29,7 +30,7 @@ Test('server', function (serverTest) {
   serverTest.test('exporting should', function (exportingTest) {
     let serverUri = 'http://central-end-user-registry'
 
-    exportingTest.test('run all required actions when starting server', function (assert) {
+    exportingTest.test('run all required actions when starting server', test => {
       let startStub = sandbox.stub().returns(P.resolve({}))
       let server = { start: startStub, info: { uri: serverUri } }
 
@@ -39,14 +40,25 @@ Test('server', function (serverTest) {
 
       require('../../src/server')
         .then(() => {
-          assert.ok(Migrator.migrate.calledOnce)
-          assert.ok(Db.connect.calledOnce)
-          assert.ok(Glue.compose.calledOnce)
-          assert.ok(startStub.calledOnce)
-          assert.ok(Logger.info.calledOnce)
-          assert.ok(Logger.info.calledWith(`Server running at: ${serverUri}`))
-          assert.end()
+          test.ok(Migrator.migrate.calledOnce)
+          test.ok(Db.connect.calledOnce)
+          test.ok(Glue.compose.calledOnce)
+          test.ok(startStub.calledOnce)
+          test.ok(Logger.info.calledOnce)
+          test.ok(Logger.info.calledWith(`Server running at: ${serverUri}`))
+          test.end()
         })
+    })
+
+    exportingTest.test('log any errors', test => {
+      let error = new Error()
+      Migrator.migrate.returns(P.reject(error))
+      require('../../src/server')
+      .catch(e => {
+        test.equal(e, error)
+        test.ok(Logger.error.calledWith(error))
+        test.end()
+      })
     })
 
     exportingTest.end()
