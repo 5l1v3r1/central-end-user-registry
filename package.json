@@ -1,6 +1,6 @@
 {
   "name": "@leveloneproject/central-end-user-registry",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Central end user registry and number generator",
   "license": "SEE LICENSE IN LICENSE",
   "private": true,
