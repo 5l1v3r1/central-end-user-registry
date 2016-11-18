@@ -3,6 +3,7 @@
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const P = require('bluebird')
+const NotFoundError = require('@leveloneproject/central-services-shared').NotFoundError
 
 const Handler = require('../../../src/routes/handler')
 const Service = require('../../../src/domain/users/service')
@@ -47,6 +48,23 @@ Test('routes handler test', handlerTest => {
 
       const reply = (response) => {
         test.deepEqual(response, { url, number })
+        test.end()
+      }
+
+      Handler.getUserByNumber(req, reply)
+    })
+
+    userByNumberTest.test('return NotFoundError is user is null', test => {
+      const number = '12345678'
+      Service.getByNumber.returns(P.resolve(null))
+
+      const req = {
+        params: { number }
+      }
+
+      const reply = (response) => {
+        test.ok(response instanceof NotFoundError)
+        test.equal(response.message, 'The requested user does not exist')
         test.end()
       }
 

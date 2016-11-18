@@ -1,14 +1,18 @@
 'use strict'
 
 const Service = require('../domain/users/service')
+const NotFoundError = require('@leveloneproject/central-services-shared').NotFoundError
 
 const userResponse = (user) => {
+  if (!user) throw new NotFoundError('The requested user does not exist')
   return { url: user.url, number: user.number }
 }
 
 const getUserByNumber = (req, rep) => {
   return Service.getByNumber(req.params.number)
-    .then(user => rep(userResponse(user)))
+    .then(user => userResponse(user))
+    .then(response => rep(response))
+    .catch(e => rep(e))
 }
 
 const createUser = (req, rep) => {

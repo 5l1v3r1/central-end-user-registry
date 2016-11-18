@@ -20,7 +20,12 @@ exports.register = (server, options, next) => {
         path: '/users/{number}',
         handler: Handler.getUserByNumber,
         config: {
-          tags: tags
+          tags: tags,
+          validate: {
+            params: {
+              number: Joi.number().integer().required()
+            }
+          }
         }
       },
       {

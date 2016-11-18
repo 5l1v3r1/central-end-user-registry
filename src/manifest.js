@@ -2,19 +2,21 @@
 
 const Config = require('./lib/config')
 const Pack = require('../package')
+const ErrorHandling = require('@leveloneproject/central-services-error-handling')
 
 module.exports = {
   connections: [
     {
       port: Config.PORT,
       routes: {
-        validate: require('@leveloneproject/central-services-error-handling').validateRoutes()
+        validate: ErrorHandling.validateRoutes()
       }
     }
   ],
   registrations: [
     { plugin: 'inert' },
     { plugin: 'vision' },
+    { plugin: '@leveloneproject/central-services-error-handling' },
     { plugin: './routes' },
     {
       plugin: {
@@ -27,7 +29,6 @@ module.exports = {
         }
       }
     },
-    { plugin: 'blipp' },
-    { plugin: '@leveloneproject/central-services-error-handling' }
+    { plugin: 'blipp' }
   ]
 }

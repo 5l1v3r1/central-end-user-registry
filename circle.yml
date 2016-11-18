@@ -14,9 +14,9 @@ machine:
     DOCKER_REPO: modusbox-level1-docker-release.jfrog.io
     APP_NAME: central-end-user-registry
     DOCKER_IMAGE: $DOCKER_REPO/$APP_NAME
-    BUCKET: elasticbeanstalk-us-west-2-886403637725
+    BUCKET: elasticbeanstalk-us-west-1-886403637725
     EB_ENV: central-end-user-registry-dev
-    EB_REGION: us-west-2
+    EB_REGION: us-west-1
     FUNC_TEST_CMD: tape 'test/functional/**/*.test.js' | tap-xunit > ./test/results/tape-functional.xml
 
 dependencies:
@@ -32,7 +32,13 @@ test:
   override:
     - set -o pipefail && npm -s run test:xunit > ./test/results/tape.xml
     - set -o pipefail && npm -s run test:coverage-check
-    - npm -s run test:circle
+    - set -o pipefail && npm -s run test:circle
   post:
     - cp ./test/results/* $CIRCLE_TEST_REPORTS
     - mv ./coverage $CIRCLE_ARTIFACTS
+
+deployment:
+  dev:
+    tag: /v[0-9]+(\.[0-9]+)*/
+    commands:
+      - ./.deploy/run.sh
