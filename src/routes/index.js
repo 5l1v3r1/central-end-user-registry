@@ -23,7 +23,7 @@ exports.register = (server, options, next) => {
           tags: tags,
           validate: {
             params: {
-              number: Joi.number().integer().required()
+              number: Joi.string().regex(/^[0-9]{1,8}$/).required()
             }
           }
         }
