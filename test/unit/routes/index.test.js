@@ -21,8 +21,9 @@ Test('routes module', routesTest => {
         test.ok(routeSpy.calledOnce)
         const routes = routeSpy.firstCall.args[0]
         assertRoute(test, routes[0], { method: 'GET', path: '/health', handler: Handler.health })
-        assertRoute(test, routes[1], { method: 'GET', path: '/users/{number}', handler: Handler.getUserByNumber })
-        assertRoute(test, routes[2], { method: 'POST', path: '/users', handler: Handler.createUser })
+        assertRoute(test, routes[1], { method: 'GET', path: '/users', handler: Handler.getUsers })
+        assertRoute(test, routes[2], { method: 'GET', path: '/users/{number}', handler: Handler.getUserByNumber })
+        assertRoute(test, routes[3], { method: 'POST', path: '/users', handler: Handler.createUser })
         test.end()
       }
 

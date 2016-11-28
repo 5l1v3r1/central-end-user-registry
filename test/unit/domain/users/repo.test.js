@@ -40,6 +40,24 @@ Test('User Repo test', repoTest => {
     getByNumberTest.end()
   })
 
+  repoTest.test('getAll should', getAllTest => {
+    getAllTest.test('find one user by number', test => {
+      const number = '12345678'
+
+      users.findAsync = sandbox.stub()
+      users.findAsync.returns(P.resolve([{ number }]))
+
+      Repo.getAll()
+      .then(response => {
+        test.equal(response[0].number, number)
+        test.ok(users.findAsync.called)
+        test.end()
+      })
+    })
+
+    getAllTest.end()
+  })
+
   repoTest.test('create should', createTest => {
     createTest.test('insert user', test => {
       const user = { url: 'test', number: 'test' }

@@ -8,6 +8,12 @@ const userResponse = (user) => {
   return { url: user.url, number: user.number }
 }
 
+const getUsers = (req, rep) => {
+  return Service.getAll()
+    .then(response => response.map(userResponse))
+    .then(response => rep(response))
+}
+
 const getUserByNumber = (req, rep) => {
   return Service.getByNumber(req.params.number)
     .then(user => userResponse(user))
@@ -25,6 +31,7 @@ const health = (req, rep) => {
 }
 
 module.exports = {
+  getUsers,
   getUserByNumber,
   createUser,
   health

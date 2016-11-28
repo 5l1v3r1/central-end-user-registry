@@ -35,6 +35,23 @@ Test('routes handler test', handlerTest => {
     healthTest.end()
   })
 
+  handlerTest.test('getUsers should', getUsersTest => {
+    getUsersTest.test('returns users from Service', test => {
+      const number = '12345678'
+      const url = 'http://test.com'
+      const user = { id: 1, url, number }
+      Service.getAll.returns(P.resolve([user]))
+
+      const reply = (response) => {
+        test.deepEqual(response, [{ url, number }])
+        test.end()
+      }
+
+      Handler.getUsers({}, reply)
+    })
+    getUsersTest.end()
+  })
+
   handlerTest.test('getUserByNumber should', userByNumberTest => {
     userByNumberTest.test('return user from Service.getByNumber', test => {
       const number = '12345678'

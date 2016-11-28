@@ -39,6 +39,23 @@ Test('users service tests', serviceTest => {
     getByNumberTest.end()
   })
 
+  serviceTest.test('getAll should', getAllTest => {
+    getAllTest.test('get users from repo', test => {
+      const number = '12345678'
+      const user = { number }
+      Repo.getAll.returns(P.resolve([user]))
+
+      Service.getAll()
+      .then(result => {
+        test.equal(result[0], user)
+        test.ok(Repo.getAll.called)
+        test.end()
+      })
+    })
+
+    getAllTest.end()
+  })
+
   serviceTest.test('create should', createTest => {
     createTest.test('attempt to create a user up to 5 times', test => {
       Rando.generateRandomNumber.returns('random string')

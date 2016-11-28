@@ -17,6 +17,14 @@ exports.register = (server, options, next) => {
       },
       {
         method: 'GET',
+        path: '/users',
+        handler: Handler.getUsers,
+        config: {
+          tags: tags
+        }
+      },
+      {
+        method: 'GET',
         path: '/users/{number}',
         handler: Handler.getUserByNumber,
         config: {

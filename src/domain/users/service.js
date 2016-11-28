@@ -16,11 +16,16 @@ const create = ({url}, attempt = 1) => {
     })
 }
 
+const getAll = () => {
+  return Repo.getAll()
+}
+
 const getByNumber = (number) => {
   return Repo.getByNumber(number)
 }
 
 module.exports = {
   create,
+  getAll,
   getByNumber
 }
