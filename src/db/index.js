@@ -10,8 +10,8 @@ function getConnection () {
   if (!connection) {
     connection = P.promisify(Massive.connect)({ connectionString: Config.DATABASE_URI }).then(db => {
       P.promisifyAll(db)
-      for (let prop in db) {
-        let dbProp = db[prop]
+      for (const prop in db) {
+        const dbProp = db[prop]
         if (dbProp instanceof Object && !(dbProp instanceof Array) && !(dbProp instanceof Function)) {
           P.promisifyAll(dbProp)
         }

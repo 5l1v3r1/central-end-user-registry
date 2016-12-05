@@ -4,7 +4,9 @@ const Service = require('../domain/users/service')
 const NotFoundError = require('@leveloneproject/central-services-shared').NotFoundError
 
 const userResponse = (user) => {
-  if (!user) throw new NotFoundError('The requested user does not exist')
+  if (!user) {
+    throw new NotFoundError('The requested user does not exist')
+  }
   return { url: user.url, number: user.number }
 }
 

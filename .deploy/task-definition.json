@@ -1,0 +1,24 @@
+[
+  {
+    "name": "<APP_NAME>",
+    "image": "<DOCKER_IMAGE>",
+    "essential": true,
+    "memoryReservation": 200,
+    "portMappings": [
+      {
+        "containerPort": 3001,
+        "hostPort": 3200
+      }
+    ],
+    "environment": [
+      {
+        "name": "CREG_DATABASE_URI",
+        "value": "<DATABASE_URI>"
+      },
+      {
+        "name": "CREG_HOSTNAME",
+        "value": "<HOSTNAME>"
+      }
+    ]
+  }
+]
