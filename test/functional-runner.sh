@@ -30,7 +30,7 @@ is_psql_up() {
 }
 
 is_central_end_user_registry_up() {
-    curl --output /dev/null --silent --head --fail http://${REGISTRY_HOST}:3001/health
+    curl --output /dev/null --silent --head --fail http://${REGISTRY_HOST}:3001
 }
 
 run_test_command()
@@ -60,7 +60,7 @@ psql <<'EOSQL'
 EOSQL
 
 >&2 printf "Central-end-user-registry is starting ..."
-docker-compose -f $docker_compose_file -f $docker_functional_compose_file up -d central-registry > /dev/null 2>&1
+docker-compose -f $docker_compose_file -f $docker_functional_compose_file up -d central-registry
 
 until is_central_end_user_registry_up; do
   >&2 printf "."

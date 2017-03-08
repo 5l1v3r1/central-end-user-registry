@@ -9,7 +9,7 @@ exports.register = (server, options, next) => {
     [
       {
         method: 'GET',
-        path: '/health',
+        path: '/',
         handler: Handler.health,
         config: {
           tags: tags
