@@ -38,12 +38,11 @@ Test('routes handler test', handlerTest => {
   handlerTest.test('getUsers should', getUsersTest => {
     getUsersTest.test('returns users from Service', test => {
       const number = '12345678'
-      const url = 'http://test.com'
-      const user = { id: 1, url, number }
+      const user = { id: 1, number }
       Service.getAll.returns(P.resolve([user]))
 
       const reply = (response) => {
-        test.deepEqual(response, [{ url, number }])
+        test.deepEqual(response, [{ number }])
         test.end()
       }
 
@@ -55,8 +54,7 @@ Test('routes handler test', handlerTest => {
   handlerTest.test('getUserByNumber should', userByNumberTest => {
     userByNumberTest.test('return user from Service.getByNumber', test => {
       const number = '12345678'
-      const url = 'http://test.com'
-      const user = { id: 1, url, number }
+      const user = { id: 1, number }
       Service.getByNumber.returns(P.resolve(user))
 
       const req = {
@@ -64,7 +62,7 @@ Test('routes handler test', handlerTest => {
       }
 
       const reply = (response) => {
-        test.deepEqual(response, { url, number })
+        test.deepEqual(response, { number })
         test.end()
       }
 
@@ -90,20 +88,20 @@ Test('routes handler test', handlerTest => {
     userByNumberTest.end()
   })
 
-  handlerTest.test('createUser should', createTest => {
-    createTest.test('create user with Service', test => {
+  handlerTest.test('registerIdentifier should', registerIdentifierTest => {
+    registerIdentifierTest.test('register user with Service', test => {
       const number = '12345678'
-      const url = 'http://test.com'
-      const user = { id: 1, url, number }
+      const dfspIdentifier = 'dfsp_identifier'
+      const user = { id: 2, dfspIdentifier, number }
 
-      Service.create.withArgs(Sinon.match({ url })).returns(P.resolve(user))
+      Service.register.withArgs(Sinon.match({ number, dfsp_identifier: dfspIdentifier })).returns(P.resolve(user))
 
       const req = {
-        payload: { url }
+        payload: { number, dfsp_identifier: dfspIdentifier }
       }
 
       const reply = (response) => {
-        test.deepEqual(response, { url, number })
+        test.deepEqual(response, { number })
         return {
           code: (statusCode) => {
             test.equal(statusCode, 201)
@@ -112,10 +110,10 @@ Test('routes handler test', handlerTest => {
         }
       }
 
-      Handler.createUser(req, reply)
+      Handler.registerIdentifier(req, reply)
     })
 
-    createTest.end()
+    registerIdentifierTest.end()
   })
 
   handlerTest.end()

@@ -38,13 +38,14 @@ exports.register = (server, options, next) => {
       },
       {
         method: 'POST',
-        path: '/users',
-        handler: Handler.createUser,
+        path: '/register',
+        handler: Handler.registerIdentifier,
         config: {
           tags: tags,
           validate: {
             payload: {
-              url: Joi.string().uri().required()
+              number: Joi.number().required(),
+              dfsp_identifier: Joi.string().required()
             }
           }
         }

@@ -7,7 +7,7 @@ const userResponse = (user) => {
   if (!user) {
     throw new NotFoundError('The requested user does not exist')
   }
-  return { url: user.url, number: user.number }
+  return { number: user.number }
 }
 
 const getUsers = (req, rep) => {
@@ -23,8 +23,8 @@ const getUserByNumber = (req, rep) => {
     .catch(e => rep(e))
 }
 
-const createUser = (req, rep) => {
-  return Service.create(req.payload)
+const registerIdentifier = (req, rep) => {
+  return Service.register(req.payload)
     .then(user => rep(userResponse(user)).code(201))
 }
 
@@ -35,6 +35,6 @@ const health = (req, rep) => {
 module.exports = {
   getUsers,
   getUserByNumber,
-  createUser,
+  registerIdentifier,
   health
 }

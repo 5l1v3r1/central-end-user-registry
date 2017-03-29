@@ -1,17 +1,14 @@
 'use strict'
 
 const Repo = require('./repo')
-const Rando = require('../../lib/rando')
 
-const create = ({url}, attempt = 1) => {
-  const randomNumber = Rando.generateRandomNumber()
-
-  return Repo.create({ url: url, number: randomNumber })
+const register = (payload, attempt = 1) => {
+  return Repo.create({ dfspIdentifier: payload.dfsp_identifier, number: payload.number })
     .catch(e => {
       if (attempt >= 5) {
         throw e
       } else {
-        return create({ url }, attempt + 1)
+        return register(payload, attempt + 1)
       }
     })
 }
@@ -25,7 +22,7 @@ const getByNumber = (number) => {
 }
 
 module.exports = {
-  create,
+  register,
   getAll,
   getByNumber
 }

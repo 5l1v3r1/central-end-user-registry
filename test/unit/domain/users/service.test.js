@@ -29,11 +29,11 @@ Test('users service tests', serviceTest => {
       Repo.getByNumber.returns(P.resolve(user))
 
       Service.getByNumber(number)
-      .then(result => {
-        test.equal(result, user)
-        test.ok(Repo.getByNumber.calledWith(number))
-        test.end()
-      })
+        .then(result => {
+          test.equal(result, user)
+          test.ok(Repo.getByNumber.calledWith(number))
+          test.end()
+        })
     })
 
     getByNumberTest.end()
@@ -46,51 +46,49 @@ Test('users service tests', serviceTest => {
       Repo.getAll.returns(P.resolve([user]))
 
       Service.getAll()
-      .then(result => {
-        test.equal(result[0], user)
-        test.ok(Repo.getAll.called)
-        test.end()
-      })
+        .then(result => {
+          test.equal(result[0], user)
+          test.ok(Repo.getAll.called)
+          test.end()
+        })
     })
 
     getAllTest.end()
   })
 
-  serviceTest.test('create should', createTest => {
-    createTest.test('attempt to create a user up to 5 times', test => {
-      Rando.generateRandomNumber.returns('random string')
+  serviceTest.test('registerIdentifier should', registerIdentifierTest => {
+    registerIdentifierTest.test('attempt to register an identifier up to 5 times', test => {
+      const dfspIdentifier = 'dfsp_identifier'
+      const number = '12345'
       const createError = new Error()
       Repo.create.returns(P.reject(createError))
 
-      Service.create({ url: 'test' })
-      .then(() => {
-        test.fail()
-        test.end()
-      })
-      .catch(e => {
-        test.equal(e, createError)
-        test.equal(Repo.create.callCount, 5)
-        test.equal(Rando.generateRandomNumber.callCount, 5)
-        test.end()
-      })
-    })
-
-    createTest.test('return created user', test => {
-      const randomString = 'some random string'
-      const url = 'http://test.com'
-
-      Rando.generateRandomNumber.returns(randomString)
-      const expected = { id: 1, url, number: randomString }
-      Repo.create.returns(P.resolve(expected))
-      Service.create({ url: 'test' })
-        .then(result => {
-          test.equal(result, expected)
-          test.equal(Repo.create.callCount, 1)
-          test.equal(Rando.generateRandomNumber.callCount, 1)
+      Service.register({ number, dfsp_identifier: dfspIdentifier })
+        .then(() => {
+          test.fail()
+          test.end()
+        })
+        .catch(e => {
+          test.equal(e, createError)
+          test.equal(Repo.create.callCount, 5)
           test.end()
         })
     })
-    createTest.end()
+
+    registerIdentifierTest.test('return registered identifier', test => {
+      const dfspIdentifier = 'dfsp_identifier'
+      const number = '12345'
+
+      const expected = { number, dfspIdentifier }
+      Repo.create.returns(P.resolve(expected))
+      Service.register({ number, dfsp_identifier: dfspIdentifier })
+        .then(result => {
+          test.equal(result, expected)
+          test.equal(Repo.create.callCount, 1)
+          test.end()
+        })
+    })
+    registerIdentifierTest.end()
   })
 
   serviceTest.end()

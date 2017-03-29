@@ -23,7 +23,7 @@ Test('routes module', routesTest => {
         assertRoute(test, routes[0], { method: 'GET', path: '/', handler: Handler.health })
         assertRoute(test, routes[1], { method: 'GET', path: '/users', handler: Handler.getUsers })
         assertRoute(test, routes[2], { method: 'GET', path: '/users/{number}', handler: Handler.getUserByNumber })
-        assertRoute(test, routes[3], { method: 'POST', path: '/users', handler: Handler.createUser })
+        assertRoute(test, routes[3], { method: 'POST', path: '/register', handler: Handler.registerIdentifier })
         test.end()
       }
 
