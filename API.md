@@ -1,4 +1,4 @@
-# Central End User Registry Documentation
+# Central End User Registry API Documentation
 ***
 
 In this guide, we'll walk through the different Central End User Registry endpoints:
