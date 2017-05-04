@@ -8,12 +8,16 @@ const Db = require('../../../../src/db')
 
 Test('User Repo test', repoTest => {
   let sandbox
-  let users
 
   repoTest.beforeEach(test => {
     sandbox = Sinon.sandbox.create()
-    users = sandbox.stub()
-    sandbox.stub(Db, 'connect', () => P.resolve({ users }))
+
+    Db.users = {
+      insert: sandbox.stub(),
+      findOne: sandbox.stub(),
+      find: sandbox.stub()
+    }
+
     test.end()
   })
 
@@ -26,13 +30,12 @@ Test('User Repo test', repoTest => {
     getByNumberTest.test('find one user by number', test => {
       const number = '12345678'
 
-      users.findOneAsync = sandbox.stub()
-      users.findOneAsync.returns(P.resolve({ number }))
+      Db.users.findOne.returns(P.resolve({ number }))
 
       Repo.getByNumber(number)
       .then(response => {
         test.equal(response.number, number)
-        test.ok(users.findOneAsync.calledWith(Sinon.match({ number })))
+        test.ok(Db.users.findOne.calledWith(Sinon.match({ number })))
         test.end()
       })
     })
@@ -41,16 +44,18 @@ Test('User Repo test', repoTest => {
   })
 
   repoTest.test('getAll should', getAllTest => {
-    getAllTest.test('find one user by number', test => {
-      const number = '12345678'
+    getAllTest.test('get all users and order by number', test => {
+      const number1 = '12345678'
+      const number2 = '12345679'
 
-      users.findAsync = sandbox.stub()
-      users.findAsync.returns(P.resolve([{ number }]))
+      Db.users.find.returns(P.resolve([{ number: number1 }, { number: number2 }]))
 
       Repo.getAll()
       .then(response => {
-        test.equal(response[0].number, number)
-        test.ok(users.findAsync.called)
+        test.equal(response.length, 2)
+        test.equal(response[0].number, number1)
+        test.equal(response[1].number, number2)
+        test.ok(Db.users.find.calledWith({}, { order: 'number asc' }))
         test.end()
       })
     })
@@ -61,11 +66,11 @@ Test('User Repo test', repoTest => {
   repoTest.test('create should', createTest => {
     createTest.test('insert user', test => {
       const user = { url: 'test', number: 'test' }
-      users.insertAsync = sandbox.stub()
+      Db.users.insert.returns(P.resolve(user))
 
       Repo.create(user)
       .then(() => {
-        test.ok(users.insertAsync.calledWith(user))
+        test.ok(Db.users.insert.calledWith(user))
         test.end()
       })
     })

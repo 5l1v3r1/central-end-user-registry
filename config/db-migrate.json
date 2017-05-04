@@ -1,5 +1,0 @@
-{
-    "defaultEnv": "local",
-    "sql-file" : true,
-    "local": {"ENV": "CREG_DATABASE_URI"}
-}

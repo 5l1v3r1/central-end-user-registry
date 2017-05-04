@@ -6,10 +6,13 @@ const Sinon = require('sinon')
 const Db = require('../../src/db')
 const Glue = require('glue')
 const Logger = require('@leveloneproject/central-services-shared').Logger
+const Config = require('../../src/lib/config')
 const Migrator = require('../../src/lib/migrator')
 
 Test('server', serverTest => {
   let sandbox
+  let oldDatabaseUri
+  let databaseUri = 'some-database-uri'
 
   serverTest.beforeEach(t => {
     sandbox = Sinon.sandbox.create()
@@ -18,12 +21,17 @@ Test('server', serverTest => {
     sandbox.stub(Logger, 'info')
     sandbox.stub(Logger, 'error')
     sandbox.stub(Migrator, 'migrate')
+
+    oldDatabaseUri = Config.DATABASE_URI
+    Config.DATABASE_URI = databaseUri
+
     t.end()
   })
 
   serverTest.afterEach(t => {
     delete require.cache[require.resolve('../../src/server')]
     sandbox.restore()
+    Config.DATABASE_URI = oldDatabaseUri
     t.end()
   })
 
@@ -42,6 +50,7 @@ Test('server', serverTest => {
         .then(() => {
           test.ok(Migrator.migrate.calledOnce)
           test.ok(Db.connect.calledOnce)
+          test.ok(Db.connect.calledWith(databaseUri))
           test.ok(Glue.compose.calledOnce)
           test.ok(startStub.calledOnce)
           test.ok(Logger.info.calledOnce)

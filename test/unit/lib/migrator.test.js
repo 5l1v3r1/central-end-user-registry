@@ -1,19 +1,25 @@
 'use strict'
 
-const src = '../../../src'
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const P = require('bluebird')
-const DbMigrate = require('db-migrate')
-const Migrator = require(`${src}/lib/migrator`)
-const Config = require(`${src}/lib/config`)
+const Path = require('path')
+const Migrations = require('@leveloneproject/central-services-database').Migrations
+const Proxyquire = require('proxyquire')
 
-Test('migrator', function (migratorTest) {
+Test('migrator', migratorTest => {
   let sandbox
+  let configuredMigrationsFolder
+  let Migrator
 
   migratorTest.beforeEach(t => {
     sandbox = Sinon.sandbox.create()
-    sandbox.stub(DbMigrate, 'getInstance')
+    sandbox.stub(Migrations)
+
+    configuredMigrationsFolder = 'migrations-path'
+
+    Migrator = Proxyquire('../../../src/lib/migrator', { '../../config/knexfile': { migrations: { directory: `../${configuredMigrationsFolder}` } } })
+
     t.end()
   })
 
@@ -22,24 +28,17 @@ Test('migrator', function (migratorTest) {
     t.end()
   })
 
-  migratorTest.test('migrate should', function (migrateTest) {
-    migrateTest.test('configure db-migrate and run migrations', function (assert) {
-      let upStub = Sinon.stub().returns(P.resolve(null))
-      DbMigrate.getInstance.returns({ up: upStub })
+  migratorTest.test('migrate should', migrateTest => {
+    migrateTest.test('override migrations directory path and run migrations', test => {
+      Migrations.migrate.returns(P.resolve())
+
+      let updatedMigrationsPath = Path.join(process.cwd(), configuredMigrationsFolder)
 
       Migrator.migrate()
         .then(() => {
-          let getInstanceStubArg1 = DbMigrate.getInstance.firstCall.args[0]
-          let getInstanceStubArg2 = DbMigrate.getInstance.firstCall.args[1]
-
-          assert.equal(getInstanceStubArg1, true)
-          assert.deepEqual(getInstanceStubArg2.config, {
-            defaultEnv: 'local',
-            'sql-file': true,
-            local: Config.DATABASE_URI
-          })
-          assert.ok(upStub.calledOnce)
-          assert.end()
+          test.ok(Migrations.migrate.calledOnce)
+          test.ok(Migrations.migrate.firstCall.args[0].migrations.directory, updatedMigrationsPath)
+          test.end()
         })
     })
 
