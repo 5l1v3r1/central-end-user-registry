@@ -3,7 +3,6 @@
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const P = require('bluebird')
-const Rando = require('../../../../src/lib/rando')
 const Repo = require('../../../../src/domain/users/repo')
 const Service = require('../../../../src/domain/users/service')
 
@@ -13,7 +12,6 @@ Test('users service tests', serviceTest => {
   serviceTest.beforeEach(t => {
     sandbox = Sinon.sandbox.create()
     sandbox.stub(Repo)
-    sandbox.stub(Rando, 'generateRandomNumber')
     t.end()
   })
 
@@ -56,39 +54,22 @@ Test('users service tests', serviceTest => {
     getAllTest.end()
   })
 
-  serviceTest.test('registerIdentifier should', registerIdentifierTest => {
-    registerIdentifierTest.test('attempt to register an identifier up to 5 times', test => {
-      const dfspIdentifier = 'dfsp_identifier'
-      const number = '12345'
-      const createError = new Error()
-      Repo.create.returns(P.reject(createError))
-
-      Service.register({ number, dfsp_identifier: dfspIdentifier })
-        .then(() => {
-          test.fail()
-          test.end()
-        })
-        .catch(e => {
-          test.equal(e, createError)
-          test.equal(Repo.create.callCount, 5)
-          test.end()
-        })
-    })
-
-    registerIdentifierTest.test('return registered identifier', test => {
-      const dfspIdentifier = 'dfsp_identifier'
+  serviceTest.test('register should', registerTest => {
+    registerTest.test('register identifier', test => {
+      const dfspIdentifier = '001:123'
       const number = '12345'
 
       const expected = { number, dfspIdentifier }
       Repo.create.returns(P.resolve(expected))
-      Service.register({ number, dfsp_identifier: dfspIdentifier })
+
+      Service.register({ number, dfspIdentifier })
         .then(result => {
           test.equal(result, expected)
           test.equal(Repo.create.callCount, 1)
           test.end()
         })
     })
-    registerIdentifierTest.end()
+    registerTest.end()
   })
 
   serviceTest.end()

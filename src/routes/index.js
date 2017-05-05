@@ -9,7 +9,7 @@ exports.register = (server, options, next) => {
     [
       {
         method: 'GET',
-        path: '/',
+        path: '/health',
         handler: Handler.health,
         config: {
           tags: tags
@@ -44,8 +44,8 @@ exports.register = (server, options, next) => {
           tags: tags,
           validate: {
             payload: {
-              number: Joi.number().required(),
-              dfsp_identifier: Joi.string().required()
+              number: Joi.string().regex(/^[0-9]{1,8}$/).required(),
+              dfspIdentifier: Joi.string().required()
             }
           }
         }

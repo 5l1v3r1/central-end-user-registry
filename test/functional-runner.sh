@@ -30,7 +30,7 @@ is_psql_up() {
 }
 
 is_central_end_user_registry_up() {
-    curl --output /dev/null --silent --head --fail http://${REGISTRY_HOST}:3001
+    curl --output /dev/null --silent --head --fail http://${REGISTRY_HOST}:3001/health
 }
 
 run_test_command()

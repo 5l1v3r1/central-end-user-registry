@@ -2,9 +2,10 @@
 ***
 
 In this guide, we'll walk through the different Central End User Registry endpoints:
-* `GET` [**Get user by number**](#get-user-by-number)
 * `POST` [**Create user**](#create-user)
+* `GET` [**Get user by number**](#get-user-by-number)
 * `GET` [**Get all users**](#get-all-users) 
+* `GET` [**Health**](#health)
 
 Information about various errors returned can be found here:
 * [**Error Information**](#error-information)
@@ -12,29 +13,67 @@ Information about various errors returned can be found here:
 The different endpoints often deal with these [data structures:](#data-structures) 
 * [**User Object**](#user-object)
 
-### Introduction
-
 ***
 
 ## Endpoints
 
-### **Get user by number**
-This endpoint retrieves a user's information from the registry.
+### **Create user**
+This endpoint allows a user to be registered and used with the registry.
 
 #### HTTP Request
-```GET http://central-end-user-registry/users/12345678```
+```POST http://central-end-user-registry/register```
+
+#### Headers
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| Content-Type | String | Must be set to `application/json` |
+
+#### Request body
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| number | String | Number for user to associate with DFSP |
+| dfspIdentifier | String | Identifier for DFSP assigned by Central Directory |
+
+#### Response 201 Created
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| Object | User | The [User object](#user-object) retrieved |
+
+#### Request
+``` http
+POST http://central-directory/commands/register HTTP/1.1
+Content-Type: application/json
+{
+  "number": "12345679",
+  "dfspIdentifer": "001:124"
+}
+```
+
+#### Response
+``` http
+HTTP/1.1 201 CREATED
+Content-Type: application/json
+{
+  "number": "123456789",
+  "dfspIdentifer": "001:124"
+}
+```
+
+### **Get user by number**
+This endpoint retrieves a user's information from the registry by number.
+
+#### HTTP Request
+```GET http://central-end-user-registry/users/{number}```
 
 #### Query Params
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| identifier | String | Identifier for the user |
+| number | String | Number for the user |
 
 #### Response 200 OK
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | Object | User | The [User object](#user-object) retrieved |
-
-
 
 #### Request
 ```http
@@ -45,8 +84,8 @@ GET http://central-end-user-registry/users/12345678 HTTP/1.1 HTTP/1.1
 ``` http
 HTTP/1.1 200 OK
 {
-  "url": "http://user.dfsp.com",
-  "number": "12345678"
+  "number": "12345678",
+  "dfspIdentifer": "001:123"
 }
 ```
 
@@ -61,61 +100,11 @@ HTTP/1.1 200 OK
 }
 ```
 
-### **Create user**
-This endpoint allows a user to be registered and used with the registry
-
-#### HTTP Request
-```POST http://central-end-user-registry/users```
-
-#### Authentication
-| Type | Description |
-| ---- | ----------- |
-| HTTP Basic | The username and password are admin:admin |
-
-#### Headers
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| Content-Type | String | Must be set to `application/json` |
-
-#### Request body
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| url | String | Url for the user |
-
-#### Response 201 Created
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| Object | User | The [User object](#user-object) retrieved |
-
-#### Request
-``` http
-POST http://central-directory/commands/register HTTP/1.1
-Content-Type: application/json
-{
-  "url": "http://user.dfsp1.com",
-}
-```
-
-#### Response
-``` http
-HTTP/1.1 201 CREATED
-Content-Type: application/json
-{
-  "url": "http://user.dfsp1.com",
-  "number": "12345678"
-}
-```
-
 ### **Get all users**
 This endpoint allows retrieval of all of the registry's users
 
 #### HTTP Request
 ```GET http://central-end-user-registry/users```
-
-#### Authentication
-| Type | Description |
-| ---- | ----------- |
-| HTTP Basic | The username and password are the key and secret of a registered DFSP, ex dfsp1:dfsp1 |
 
 #### Response 200 OK
 | Field | Type | Description |
@@ -133,18 +122,42 @@ GET http://central-end-user-registry/users HTTP/1.1
 HTTP/1.1 200 OK
 [
   {
-    "url": "http://user.dfsp.com",
-    "number": "12345678"
+    "number": "12345678",
+    "dfspIdentifer": "001:123"
   },
   {
-    "url": "http://user.dfsp2.com",
-    "number": "90123456"
+    "number": "90123456",
+    "dfspIdentifier": "001:321"
   },
   {
-    "url": "http://user.dfsp2.com",
-    "number": "78901234"
-    }
+    "number": "08901234",
+    "dfspIdentifier": "001:456"
+  }
 ]
+```
+
+### Health
+Get the current status of the service
+
+#### HTTP Request
+`GET http://central-ledger/health`
+
+#### Response 200 OK
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| status | String | The status of the end user registry, *OK* if the service is working |
+
+#### Request
+``` http
+GET http://central-end-user-registry/health HTTP/1.1
+```
+
+#### Response
+``` http
+HTTP/1.1 200 OK
+{
+  "status": "OK"
+}
 ```
 
 ***
@@ -157,8 +170,8 @@ Represents a user that has registered with the Central End User Registry.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| url | String | Url for the user |
-| number | String | Identifier for the user |
+| number | String | Number for user to associate with DFSP |
+| dfspIdentifier | String | Identifier for DFSP assigned by Central Directory |
 
 ***
 
@@ -183,14 +196,14 @@ An error object can have the following fields:
 HTTP/1.1 404 Not Found
 Content-Type: application/json
 {
-  "id": "InvalidQueryParameterError",
-  "message": "Error validating one or more query parameters",
+  "id": "InvalidUriParameterError",
+  "message": "Error validating one or more uri parameters",
   "validationErrors": [
     {
-      "message": "'0' is not a registered identifierType",
+      "message": "number with value \"79544291a\" fails to match the required pattern: /^[0-9]{1,8}$/",
       "params": {
-        "key": "identifierType",
-        "value": "0"
+        "value": "79544291a",
+        "key": "number"
       }
     }
   ]

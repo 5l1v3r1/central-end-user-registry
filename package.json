@@ -46,7 +46,6 @@
     "hapi-swagger": "7.7.0",
     "inert": "4.2.0",
     "joi": "10.4.1",
-    "randomstring": "1.1.5",
     "rc": "1.2.1",
     "uuid4": "1.0.0",
     "vision": "4.1.1"

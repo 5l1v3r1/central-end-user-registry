@@ -12,11 +12,21 @@ const get = (route) => {
   return Request.get(route)
 }
 
-Test('can register and retrieve user', test => {
-  const dfspIdentifier = 'http://test2.com'
-  const number = '262'
+Test('return health', test => {
+  get('/health')
+    .expect(200)
+    .expect('Content-Type', /json/)
+    .then(res => {
+      test.equal(res.body.status, 'OK')
+      test.end()
+    })
+})
 
-  post('/register', { dfsp_identifier: dfspIdentifier, number: number })
+Test('can register and retrieve user', test => {
+  const dfspIdentifier = '001:123'
+  const number = '00000262'
+
+  post('/register', { dfspIdentifier, number })
     .expect(201)
     .then(postResponse => {
       const number = postResponse.body.number
@@ -24,6 +34,7 @@ Test('can register and retrieve user', test => {
         .expect(200)
         .then(getResponse => {
           test.equal(getResponse.body.number, number)
+          test.equal(getResponse.body.dfspIdentifier, dfspIdentifier)
           test.end()
         })
     })

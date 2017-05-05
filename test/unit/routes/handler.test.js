@@ -23,9 +23,9 @@ Test('routes handler test', handlerTest => {
   })
 
   handlerTest.test('health should', healthTest => {
-    healthTest.test('return status: ok', test => {
+    healthTest.test('return status: OK', test => {
       const reply = (response) => {
-        test.equal(response.status, 'ok')
+        test.equal(response.status, 'OK')
         test.end()
       }
 
@@ -38,11 +38,12 @@ Test('routes handler test', handlerTest => {
   handlerTest.test('getUsers should', getUsersTest => {
     getUsersTest.test('returns users from Service', test => {
       const number = '12345678'
-      const user = { id: 1, number }
+      const dfspIdentifier = '001:123'
+      const user = { id: 1, number, dfspIdentifier }
       Service.getAll.returns(P.resolve([user]))
 
       const reply = (response) => {
-        test.deepEqual(response, [{ number }])
+        test.deepEqual(response, [{ number, dfspIdentifier }])
         test.end()
       }
 
@@ -54,7 +55,8 @@ Test('routes handler test', handlerTest => {
   handlerTest.test('getUserByNumber should', userByNumberTest => {
     userByNumberTest.test('return user from Service.getByNumber', test => {
       const number = '12345678'
-      const user = { id: 1, number }
+      const dfspIdentifier = '001:123'
+      const user = { id: 1, number, dfspIdentifier }
       Service.getByNumber.returns(P.resolve(user))
 
       const req = {
@@ -62,7 +64,7 @@ Test('routes handler test', handlerTest => {
       }
 
       const reply = (response) => {
-        test.deepEqual(response, { number })
+        test.deepEqual(response, { number, dfspIdentifier })
         test.end()
       }
 
@@ -91,17 +93,17 @@ Test('routes handler test', handlerTest => {
   handlerTest.test('registerIdentifier should', registerIdentifierTest => {
     registerIdentifierTest.test('register user with Service', test => {
       const number = '12345678'
-      const dfspIdentifier = 'dfsp_identifier'
+      const dfspIdentifier = '001:123'
       const user = { id: 2, dfspIdentifier, number }
 
-      Service.register.withArgs(Sinon.match({ number, dfsp_identifier: dfspIdentifier })).returns(P.resolve(user))
+      Service.register.withArgs(Sinon.match({ number, dfspIdentifier })).returns(P.resolve(user))
 
       const req = {
-        payload: { number, dfsp_identifier: dfspIdentifier }
+        payload: { number, dfspIdentifier }
       }
 
       const reply = (response) => {
-        test.deepEqual(response, { number })
+        test.deepEqual(response, { number, dfspIdentifier })
         return {
           code: (statusCode) => {
             test.equal(statusCode, 201)

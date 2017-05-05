@@ -7,7 +7,7 @@ const userResponse = (user) => {
   if (!user) {
     throw new NotFoundError('The requested user does not exist')
   }
-  return { number: user.number }
+  return { number: user.number, dfspIdentifier: user.dfspIdentifier }
 }
 
 const getUsers = (req, rep) => {
@@ -29,7 +29,7 @@ const registerIdentifier = (req, rep) => {
 }
 
 const health = (req, rep) => {
-  return rep({ status: 'ok' })
+  return rep({ status: 'OK' })
 }
 
 module.exports = {
