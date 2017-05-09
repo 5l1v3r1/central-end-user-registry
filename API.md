@@ -37,7 +37,7 @@ This endpoint allows a user to be registered and used with the registry.
 #### Response 201 Created
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| Object | User | The [User object](#user-object) retrieved |
+| Object | User | The [User object](#user-object) created |
 
 #### Request
 ``` http
@@ -59,6 +59,17 @@ Content-Type: application/json
 }
 ```
 
+#### Errors (4xx)
+| Field | Description |
+| ----- | ----------- |
+| AlreadyExistsError | The number has already been registered for this DFSP |
+``` http
+{
+  "id": "AlreadyExistsError",
+  "message": "The number has already been registered for this DFSP"
+}
+```
+
 ### **Get user by number**
 This endpoint retrieves a user's information from the registry by number.
 
@@ -73,7 +84,7 @@ This endpoint retrieves a user's information from the registry by number.
 #### Response 200 OK
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| Object | User | The [User object](#user-object) retrieved |
+| Object | Array | List of registered [User objects](#user-object) for the number |
 
 #### Request
 ```http
@@ -83,10 +94,12 @@ GET http://central-end-user-registry/users/12345678 HTTP/1.1 HTTP/1.1
 #### Response
 ``` http
 HTTP/1.1 200 OK
-{
-  "number": "12345678",
-  "dfspIdentifer": "001:123"
-}
+[
+  {
+    "number": "12345678",
+    "dfspIdentifer": "001:123"
+  }
+]
 ```
 
 #### Errors (4xx)

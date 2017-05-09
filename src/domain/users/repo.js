@@ -7,7 +7,7 @@ exports.getAll = () => {
 }
 
 exports.getByNumber = (number) => {
-  return Db.users.findOne({ number })
+  return Db.users.find({ number }, { order: 'dfspIdentifier asc' })
 }
 
 exports.create = (user) => {

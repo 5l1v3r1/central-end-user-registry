@@ -57,21 +57,22 @@ Test('routes handler test', handlerTest => {
       const number = '12345678'
       const dfspIdentifier = '001:123'
       const user = { id: 1, number, dfspIdentifier }
-      Service.getByNumber.returns(P.resolve(user))
+      Service.getByNumber.returns(P.resolve([user]))
 
       const req = {
         params: { number }
       }
 
       const reply = (response) => {
-        test.deepEqual(response, { number, dfspIdentifier })
+        test.equal(1, response.length)
+        test.deepEqual(response[0], { number, dfspIdentifier })
         test.end()
       }
 
       Handler.getUserByNumber(req, reply)
     })
 
-    userByNumberTest.test('return NotFoundError is user is null', test => {
+    userByNumberTest.test('return NotFoundError is users is null', test => {
       const number = '12345678'
       Service.getByNumber.returns(P.resolve(null))
 
@@ -81,12 +82,30 @@ Test('routes handler test', handlerTest => {
 
       const reply = (response) => {
         test.ok(response instanceof NotFoundError)
-        test.equal(response.message, 'The requested user does not exist')
+        test.equal(response.message, 'The requested number does not exist')
         test.end()
       }
 
       Handler.getUserByNumber(req, reply)
     })
+
+    userByNumberTest.test('return NotFoundError is users is empty', test => {
+      const number = '12345678'
+      Service.getByNumber.returns(P.resolve([]))
+
+      const req = {
+        params: { number }
+      }
+
+      const reply = (response) => {
+        test.ok(response instanceof NotFoundError)
+        test.equal(response.message, 'The requested number does not exist')
+        test.end()
+      }
+
+      Handler.getUserByNumber(req, reply)
+    })
+
     userByNumberTest.end()
   })
 
@@ -110,6 +129,25 @@ Test('routes handler test', handlerTest => {
             test.end()
           }
         }
+      }
+
+      Handler.registerIdentifier(req, reply)
+    })
+
+    registerIdentifierTest.test('throw NotFoundException if directory yields empty', test => {
+      const number = '12345678'
+      const dfspIdentifier = '001:123'
+
+      let error = new Error()
+      Service.register.withArgs(Sinon.match({ number, dfspIdentifier })).returns(P.reject(error))
+
+      const req = {
+        payload: { number, dfspIdentifier }
+      }
+
+      let reply = (e) => {
+        test.equal(e, error)
+        test.end()
       }
 
       Handler.registerIdentifier(req, reply)

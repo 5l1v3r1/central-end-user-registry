@@ -3,29 +3,35 @@
 const Service = require('../domain/users/service')
 const NotFoundError = require('@leveloneproject/central-services-shared').NotFoundError
 
-const userResponse = (user) => {
-  if (!user) {
-    throw new NotFoundError('The requested user does not exist')
+const usersResponse = (users) => {
+  if (!users || users.length === 0) {
+    throw new NotFoundError('The requested number does not exist')
   }
-  return { number: user.number, dfspIdentifier: user.dfspIdentifier }
+  return users.map(userResponse)
+}
+
+const userResponse = (user) => {
+  return {
+    number: user.number,
+    dfspIdentifier: user.dfspIdentifier
+  }
 }
 
 const getUsers = (req, rep) => {
   return Service.getAll()
-    .then(response => response.map(userResponse))
-    .then(response => rep(response))
+    .then(users => rep(usersResponse(users)))
 }
 
 const getUserByNumber = (req, rep) => {
   return Service.getByNumber(req.params.number)
-    .then(user => userResponse(user))
-    .then(response => rep(response))
-    .catch(e => rep(e))
+    .then(users => rep(usersResponse(users)))
+    .catch(rep)
 }
 
 const registerIdentifier = (req, rep) => {
   return Service.register(req.payload)
     .then(user => rep(userResponse(user)).code(201))
+    .catch(rep)
 }
 
 const health = (req, rep) => {

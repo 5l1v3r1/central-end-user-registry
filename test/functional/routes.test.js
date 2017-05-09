@@ -33,9 +33,38 @@ Test('can register and retrieve user', test => {
       get(`/users/${number}`)
         .expect(200)
         .then(getResponse => {
-          test.equal(getResponse.body.number, number)
-          test.equal(getResponse.body.dfspIdentifier, dfspIdentifier)
+          test.equal(1, getResponse.body.length)
+          test.equal(getResponse.body[0].number, number)
+          test.equal(getResponse.body[0].dfspIdentifier, dfspIdentifier)
           test.end()
         })
+    })
+})
+
+Test('throws error if duplicate registration', test => {
+  const dfspIdentifier = '001:123'
+  const number = '00000263'
+
+  post('/register', { dfspIdentifier, number })
+    .expect(201)
+    .then(postResponse => {
+      post('/register', { dfspIdentifier, number })
+        .expect(422)
+        .then(res => {
+          test.equal(res.body.id, 'AlreadyExistsError')
+          test.equal(res.body.message, 'The number has already been registered for this DFSP')
+          test.end()
+        })
+    })
+})
+
+Test('throws error if number not found', test => {
+  const number = '00000261'
+
+  get(`/users/${number}`)
+    .expect(404)
+    .then(res => {
+      test.equal(res.body.id, 'NotFoundError')
+      test.end()
     })
 })

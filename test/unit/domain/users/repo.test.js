@@ -30,12 +30,13 @@ Test('User Repo test', repoTest => {
     getByNumberTest.test('find one user by number', test => {
       const number = '12345678'
 
-      Db.users.findOne.returns(P.resolve({ number }))
+      Db.users.find.returns(P.resolve([{ number }]))
 
       Repo.getByNumber(number)
       .then(response => {
-        test.equal(response.number, number)
-        test.ok(Db.users.findOne.calledWith(Sinon.match({ number })))
+        test.equal(1, response.length)
+        test.equal(response[0].number, number)
+        test.ok(Db.users.find.calledWith(Sinon.match({ number }), { order: 'dfspIdentifier asc' }))
         test.end()
       })
     })

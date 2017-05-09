@@ -39,12 +39,33 @@ Test('users repo', repoTest => {
       createUser(number, dfspIdentifier)
         .then((user) => {
           Repo.getByNumber(user.number)
-            .then((found) => {
+            .then((foundNumbers) => {
+              test.equal(1, foundNumbers.length)
+
+              let found = foundNumbers[0]
               test.notEqual(found, user)
               test.equal(found.id, user.id)
               test.equal(found.number, user.number)
               test.equal(found.dfspIdentifier, user.dfspIdentifier)
               test.deepEqual(found.createdDate, user.createdDate)
+              test.end()
+            })
+        })
+    })
+
+    getByNumberTest.test('return multiple records for number and order by dfspIdentifier ascending', test => {
+      const number = '12345676'
+      const dfspIdentifier1 = '001:129'
+      const dfspIdentifier2 = '001:128'
+
+      createUser(number, dfspIdentifier1)
+        .then(() => createUser(number, dfspIdentifier2))
+        .then(() => {
+          Repo.getByNumber(number)
+            .then((found) => {
+              test.equal(2, found.length)
+              test.equal(dfspIdentifier2, found[0].dfspIdentifier)
+              test.equal(dfspIdentifier1, found[1].dfspIdentifier)
               test.end()
             })
         })
