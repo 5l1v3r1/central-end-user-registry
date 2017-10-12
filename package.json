@@ -2,7 +2,7 @@
   "name": "@leveloneproject/central-end-user-registry",
   "version": "0.9.0",
   "description": "Central end user registry",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "CC-BY-SA-4.0",
   "private": true,
   "repository": {
     "type": "git",
